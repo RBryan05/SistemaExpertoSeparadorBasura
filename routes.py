@@ -1,6 +1,7 @@
+# routes.py - Actualizado con soporte de cookies
 import os, time, requests, json, shutil
 from io import BytesIO
-from flask import render_template, request, jsonify
+from flask import render_template, request, jsonify, make_response
 from flask_socketio import SocketIO
 from config import UPLOAD_FOLDER, HISTORIAL_LIVE_FILE
 from model import predecir_imagen
@@ -32,14 +33,15 @@ def register_routes(app):
         resultado = None
         ruta_imagen = None
         ruta_url = None
+        
+        # Obtener session_id de la cookie
+        session_id = request.cookies.get('reciclaje_session_id')
 
         if request.method == "POST":
-            # Obtener o crear session_id
-            session_id = request.form.get('session_id') or request.headers.get('X-Session-ID')
             if not session_id:
                 session_id = session_manager.create_session()
             else:
-                # Verificar que la sesión existe, si no, crear una nueva
+                # Verificar que la sesión existe
                 if session_manager.get_session(session_id) is None:
                     session_id = session_manager.create_session()
             
@@ -131,14 +133,46 @@ def register_routes(app):
 
                 # Si es petición AJAX (Fetch)
                 if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-                    return jsonify({"resultado": resultado, "session_id": session_id})
+                    response = jsonify({"resultado": resultado, "session_id": session_id})
+                    # Setear cookie si es nueva sesión
+                    if not request.cookies.get('reciclaje_session_id'):
+                        response.set_cookie('reciclaje_session_id', session_id, 
+                                          max_age=30*24*60*60,  # 30 días
+                                          httponly=True,
+                                          samesite='Lax')
+                    return response
 
             except Exception as e:
                 if request.headers.get("X-Requested-With") == "XMLHttpRequest":
                     return jsonify({"resultado": f"Error al procesar la imagen: {e}", "session_id": session_id})
                 resultado = f"Error al procesar la imagen: {e}"
 
-        return render_template("index.html", resultado=resultado, ruta_imagen=ruta_imagen, ruta_url=ruta_url)
+        # Preparar respuesta
+        response = make_response(render_template("index.html", resultado=resultado, ruta_imagen=ruta_imagen, ruta_url=ruta_url))
+        
+        # Setear cookie si es nueva sesión y no existe cookie
+        if not session_id:
+            session_id = session_manager.create_session()
+            response.set_cookie('reciclaje_session_id', session_id, 
+                              max_age=30*24*60*60,  # 30 días
+                              httponly=True,
+                              samesite='Lax')
+        
+        return response
+
+    @app.route("/nueva_sesion", methods=["POST"])
+    def crear_nueva_sesion():
+        """Crear una nueva sesión para un usuario"""
+        try:
+            session_id = session_manager.create_session()
+            response = jsonify({"success": True, "session_id": session_id})
+            response.set_cookie('reciclaje_session_id', session_id, 
+                              max_age=30*24*60*60,  # 30 días
+                              httponly=True,
+                              samesite='Lax')
+            return response
+        except Exception as e:
+            return jsonify({"success": False, "error": str(e)})
 
     @app.route("/analizar_url", methods=["GET"])
     def analizar_url():
@@ -224,9 +258,11 @@ def register_routes(app):
     @app.route("/historial")
     def ver_historial():
         """Endpoint para ver el historial de análisis de una sesión específica"""
-        session_id = request.args.get('session_id')
+        # Obtener session_id de la cookie en lugar de query parameter
+        session_id = request.cookies.get('reciclaje_session_id')
+        
         if not session_id:
-            return jsonify({"error": "Se requiere session_id"})
+            return jsonify({"error": "No hay sesión activa"})
         
         try:
             session_data = session_manager.get_session(session_id)

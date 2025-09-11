@@ -1,4 +1,4 @@
-// chatbot.js - Actualizado para el sistema de sesiones
+// chatbot.js - Actualizado para sistema de cookies
 import { HistorialManager } from './historialManager.js';
 import { bindChatEvents } from './chatEvents.js';
 import { addUserMessage, addBotMessage, showCancelButton, showSendButton } from './chatUI.js';
@@ -34,34 +34,30 @@ export class ChatBot {
         bindChatEvents(this);
         this.adjustTextareaHeight();
 
-        // Esperar a que se inicialice la sesión
+        // Inicializar sesión (las cookies se manejan automáticamente)
         await this.backendService.initializeSession();
 
         // Mostrar información de sesión en consola para debugging
-        console.log('[CHATBOT] Sesión inicializada:', this.backendService.getSessionId());
+        console.log('[CHATBOT] Sistema de cookies activado');
+        console.log('[CHATBOT] Tu historial se mantendrá entre sesiones');
 
-        // Mostrar mensaje de bienvenida con información de sesión
+        // Mostrar mensaje de bienvenida
         this.mostrarMensajeSesion();
     }
 
     mostrarMensajeSesion() {
-        const sessionId = this.backendService.getSessionId();
-        const shortSessionId = sessionId ? sessionId.substring(0, 8) : 'N/A';
-
-        console.log(`[SESIÓN] Tu sesión personal: ${shortSessionId}...`);
-        console.log('[SESIÓN] Tus análisis son privados y se guardan solo para ti');
-        console.log('[SESIÓN] La sesión se limpia automáticamente después de 24h de inactividad');
+        console.log('[SESIÓN] 🔒 Tu historial es persistente (cookies activadas)');
+        console.log('[SESIÓN] 📅 Tu sesión se mantendrá por 30 días');
+        console.log('[SESIÓN] ⏰ El servidor limpia sesiones inactivas después de 24h');
 
         // Opcional: Agregar indicador visual en la UI
-        this.actualizarIndicadorSesion(shortSessionId);
+        this.actualizarIndicadorSesion();
     }
 
-    actualizarIndicadorSesion(shortSessionId) {
-        // Buscar si ya existe el indicador
+    actualizarIndicadorSesion() {
         let indicador = document.querySelector('.session-indicator');
 
         if (!indicador) {
-            // Crear indicador de sesión
             indicador = document.createElement('div');
             indicador.className = 'session-indicator';
             indicador.style.cssText = `
@@ -76,18 +72,21 @@ export class ChatBot {
                 z-index: 1000;
                 backdrop-filter: blur(10px);
                 border: 1px solid rgba(255, 255, 255, 0.1);
-                transition: opacity 0.3s ease;
             `;
             document.body.appendChild(indicador);
-
-            // Ocultar después de 5 segundos
-            setTimeout(() => {
-                indicador.style.opacity = '0';
-                setTimeout(() => indicador.remove(), 300);
-            }, 5000);
         }
 
-        indicador.innerHTML = `🔒 Sesión: ${shortSessionId}`;
+        indicador.innerHTML = '🔒 Sesión persistente activada';
+
+        // Ocultar después de 5 segundos
+        setTimeout(() => {
+            indicador.style.opacity = '0';
+            setTimeout(() => {
+                if (indicador.parentNode) {
+                    indicador.parentNode.removeChild(indicador);
+                }
+            }, 300);
+        }, 5000);
     }
 
     adjustTextareaHeight() {

@@ -1,4 +1,4 @@
-// backendService.js - Actualizado con soporte de sesiones
+// backendService.js - Actualizado para usar cookies automáticamente
 export class BackendService {
     constructor() {
         this.baseUrl = '/';
@@ -7,70 +7,36 @@ export class BackendService {
     }
 
     async initializeSession() {
-        // Verificar si ya tenemos una sesión en sessionStorage
-        const existingSessionId = sessionStorage.getItem('chatbot_session_id');
+        // Las cookies se envían automáticamente, no necesitamos almacenar en sessionStorage
+        console.log('[SESSION] Sistema de cookies activado - Las sesiones se manejan automáticamente');
         
-        if (existingSessionId) {
-            // Verificar si la sesión sigue siendo válida
-            try {
-                const response = await fetch(`/historial?session_id=${existingSessionId}`);
-                if (response.ok) {
-                    this.sessionId = existingSessionId;
-                    console.log('[SESSION] Sesión existente restaurada:', this.sessionId);
-                    return;
-                }
-            } catch (error) {
-                console.warn('[SESSION] Error al verificar sesión existente:', error);
-            }
-        }
-        
-        // Crear nueva sesión
-        await this.createNewSession();
+        // Solo para debugging, podemos verificar la sesión actual
+        await this.verifyCurrentSession();
     }
 
-    async createNewSession() {
+    async verifyCurrentSession() {
         try {
-            const response = await fetch('/nueva_sesion', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
+            const response = await fetch('/historial');
+            if (response.ok) {
+                const historial = await response.json();
+                if (historial && !historial.error) {
+                    this.sessionId = historial.session_id;
+                    console.log('[SESSION] Sesión verificada:', this.sessionId);
                 }
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const result = await response.json();
-            if (result.success) {
-                this.sessionId = result.session_id;
-                sessionStorage.setItem('chatbot_session_id', this.sessionId);
-                console.log('[SESSION] Nueva sesión creada:', this.sessionId);
-            } else {
-                throw new Error(result.error || 'Error al crear sesión');
             }
         } catch (error) {
-            console.error('[SESSION] Error al crear nueva sesión:', error);
-            // Generar un ID temporal como fallback
-            this.sessionId = 'temp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-            sessionStorage.setItem('chatbot_session_id', this.sessionId);
-            console.warn('[SESSION] Usando ID temporal:', this.sessionId);
+            console.warn('[SESSION] No se pudo verificar sesión (puede ser normal):', error);
         }
     }
 
     async sendImages(images) {
-        // Asegurar que tenemos una sesión
-        if (!this.sessionId) {
-            await this.initializeSession();
-        }
-
         const formData = this.createFormData(images);
         
         const response = await fetch(this.baseUrl, {
             method: 'POST',
             headers: { 
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-Session-ID': this.sessionId 
+                'X-Requested-With': 'XMLHttpRequest'
+                // Las cookies se envían automáticamente por el navegador
             },
             body: formData
         });
@@ -81,10 +47,9 @@ export class BackendService {
 
         const json = await response.json();
         
-        // Si el servidor devuelve un nuevo session_id, actualizarlo
-        if (json.session_id && json.session_id !== this.sessionId) {
+        // Actualizar sessionId si viene en la respuesta
+        if (json.session_id) {
             this.sessionId = json.session_id;
-            sessionStorage.setItem('chatbot_session_id', this.sessionId);
             console.log('[SESSION] ID de sesión actualizado:', this.sessionId);
         }
         
@@ -94,10 +59,7 @@ export class BackendService {
     createFormData(images) {
         const formData = new FormData();
         
-        // Agregar session_id al FormData
-        if (this.sessionId) {
-            formData.append('session_id', this.sessionId);
-        }
+        // NOTA: Ya no enviamos session_id en el FormData porque va en la cookie
         
         // Agregar archivos
         images
@@ -118,12 +80,8 @@ export class BackendService {
 
     // Método para obtener el historial de la sesión actual
     async getSessionHistory() {
-        if (!this.sessionId) {
-            await this.initializeSession();
-        }
-
         try {
-            const response = await fetch(`/historial?session_id=${this.sessionId}`);
+            const response = await fetch('/historial');
             if (response.ok) {
                 return await response.json();
             } else {
@@ -138,15 +96,27 @@ export class BackendService {
 
     // Método para crear una nueva sesión manualmente (reiniciar conversación)
     async resetSession() {
-        // Limpiar sesión actual
-        sessionStorage.removeItem('chatbot_session_id');
-        this.sessionId = null;
-        
-        // Crear nueva sesión
-        await this.createNewSession();
-        
-        console.log('[SESSION] Sesión reiniciada. Nueva sesión:', this.sessionId);
-        return this.sessionId;
+        try {
+            const response = await fetch('/nueva_sesion', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                if (result.success) {
+                    this.sessionId = result.session_id;
+                    console.log('[SESSION] Sesión reiniciada. Nueva sesión:', this.sessionId);
+                    return this.sessionId;
+                }
+            }
+            throw new Error('Error al reiniciar sesión');
+        } catch (error) {
+            console.error('[SESSION] Error al reiniciar sesión:', error);
+            throw error;
+        }
     }
 
     // Getter para obtener el ID de sesión actual
