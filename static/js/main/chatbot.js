@@ -1,4 +1,5 @@
 // chatbot.js
+import { HistorialManager } from './historialManager.js';
 import { bindChatEvents } from './chatEvents.js';
 import { addUserMessage, addBotMessage, showCancelButton, showSendButton } from './chatUI.js';
 import { ImageHandler } from './imageHandler.js';
@@ -32,6 +33,7 @@ export class ChatBot {
     initialize() {
         bindChatEvents(this);
         this.adjustTextareaHeight();
+        this.reiniciarHistorial(); // Reiniciar historial al cargar la página
     }
 
     adjustTextareaHeight() {
@@ -39,7 +41,7 @@ export class ChatBot {
         const padding = parseInt(style.paddingTop) + parseInt(style.paddingBottom);
         const maxHeight = 270;
         const minHeight = 20;
-        
+
         this.messageInput.style.height = 'auto';
         const newHeight = Math.min(Math.max(this.messageInput.scrollHeight - padding, minHeight), maxHeight);
         this.messageInput.style.height = `${newHeight}px`;
@@ -48,7 +50,7 @@ export class ChatBot {
     // Delegación a ImageHandler
     get selectedImages() { return this.imageHandler.selectedImages; }
     set selectedImages(value) { this.imageHandler.selectedImages = value; }
-    
+
     detectImageUrls() { this.imageHandler.detectImageUrls(); }
     handleFileSelect(files) { this.imageHandler.handleFileSelect(files); }
     updateImagePreviews() { this.imageHandler.updateImagePreviews(); }
@@ -58,7 +60,7 @@ export class ChatBot {
     // Delegación a TypingAnimation
     get currentTypingAnimation() { return this.typingAnimation.currentAnimation; }
     set currentTypingAnimation(value) { this.typingAnimation.currentAnimation = value; }
-    
+
     typeMessage(element, text, speed = 30) { this.typingAnimation.typeMessage(element, text, speed); }
     cancelTyping() { this.typingAnimation.cancelTyping(); }
 
@@ -83,9 +85,9 @@ export class ChatBot {
 
         this.sendBtn.disabled = true;
         const cleanText = text;
-        
+
         addUserMessage(this, cleanText, this.selectedImages);
-        
+
         const imagesToSend = [...this.selectedImages];
         this.messageInput.value = '';
         this.selectedImages = [];
@@ -108,6 +110,10 @@ export class ChatBot {
             showSendButton(this);
             this.sendBtn.disabled = false;
         }
+    }
+
+    async reiniciarHistorial() {
+        await HistorialManager.inicializarHistorialEnNuevaSesion();
     }
 
     // Delegación al ImageModal
