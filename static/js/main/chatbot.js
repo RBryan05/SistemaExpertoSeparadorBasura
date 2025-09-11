@@ -1,4 +1,4 @@
-// chatbot.js - Actualizado para enviar texto del usuario al historial
+// chatbot.js - Actualizado para cargar historial al inicializar
 import { HistorialManager } from './historialManager.js';
 import { bindChatEvents } from './chatEvents.js';
 import { addUserMessage, addBotMessage, showCancelButton, showSendButton } from './chatUI.js';
@@ -40,8 +40,115 @@ export class ChatBot {
         // Mostrar información de sesión en consola para debugging
         console.log('[CHATBOT] Sesión inicializada:', this.backendService.getSessionId());
 
-        // Mostrar mensaje de bienvenida con información de sesión
-        this.mostrarMensajeSesion();
+        // Cargar historial de la sesión
+        await this.cargarHistorial();
+
+        // Mostrar mensaje de bienvenida con información de sesión solo si no hay historial
+        if (this.chatMessages.children.length <= 1) { // Solo mensaje de bienvenida inicial
+            this.mostrarMensajeSesion();
+        }
+    }
+
+    async cargarHistorial() {
+        const sessionId = this.backendService.getSessionId();
+        if (!sessionId) return;
+
+        try {
+            const historial = await this.backendService.getSessionHistory();
+            
+            if (!historial || !historial.conversations || historial.conversations.length === 0) {
+                console.log('[HISTORIAL] No hay historial previo para esta sesión');
+                return;
+            }
+
+            // Cargar todas las conversaciones
+            historial.conversations.forEach(conversacion => {
+                this.cargarConversacion(conversacion);
+            });
+
+            console.log(`[HISTORIAL] ${historial.conversations.length} conversaciones cargadas`);
+            
+        } catch (error) {
+            console.error('[HISTORIAL] Error al cargar historial:', error);
+        }
+    }
+
+    cargarConversacion(conversacion) {
+        // Recrear mensaje del usuario
+        const userImages = this.convertirImagenesUsuario(conversacion.user_message.images);
+        addUserMessage(this, conversacion.user_message.text, userImages);
+
+        // Recrear respuestas del bot
+        if (conversacion.bot_responses && conversacion.bot_responses.length > 0) {
+            const textoRespuesta = this.generarTextoRespuestaBot(conversacion.bot_responses);
+            // No pasamos imágenes al bot, solo el texto con las recomendaciones
+            addBotMessage(this, textoRespuesta, [], false, false);
+        }
+    }
+
+    convertirImagenesUsuario(imagenes) {
+        if (!imagenes || imagenes.length === 0) return [];
+
+        return imagenes.map(img => {
+            if (img.tipo === 'archivo_subido') {
+                return {
+                    type: 'file',
+                    preview: img.url_relativa,
+                    name: img.filename
+                };
+            } else if (img.tipo === 'url_externa') {
+                return {
+                    type: 'url',
+                    preview: img.url_relativa,
+                    url: img.url_original,
+                    name: img.filename
+                };
+            } else if (img.tipo === 'ruta_local') {
+                return {
+                    type: 'file',
+                    preview: `/static/uploads/${img.filename}`,
+                    name: img.filename
+                };
+            }
+            return null;
+        }).filter(img => img !== null);
+    }
+
+    convertirImagenesBot(botResponses) {
+        // Las imágenes del bot son las mismas que las del usuario, solo las mostramos de nuevo
+        const imagenes = [];
+        botResponses.forEach(response => {
+            if (response.imagen) {
+                const img = response.imagen;
+                if (img.tipo === 'archivo_subido' || img.tipo === 'url_externa') {
+                    imagenes.push({
+                        type: img.tipo === 'url_externa' ? 'url' : 'file',
+                        preview: img.url_relativa,
+                        name: img.filename
+                    });
+                } else if (img.tipo === 'ruta_local') {
+                    imagenes.push({
+                        type: 'file',
+                        preview: `/static/uploads/${img.filename}`,
+                        name: img.filename
+                    });
+                }
+            }
+        });
+        return imagenes;
+    }
+
+    generarTextoRespuestaBot(botResponses) {
+        let mensaje = "";
+        
+        botResponses.forEach((response, idx) => {
+            mensaje += `Imagen ${idx + 1}:<br>`;
+            mensaje += `Material identificado: ${response.resultado.etiqueta}<br>`;
+            mensaje += `Porcentaje de confianza: ${response.resultado.confianza_porcentaje}<br>`;
+            mensaje += `💡 ${response.recomendacion}<br><br>`;
+        });
+
+        return mensaje;
     }
 
     mostrarMensajeSesion() {

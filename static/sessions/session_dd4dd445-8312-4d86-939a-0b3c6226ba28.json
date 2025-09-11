@@ -1,8 +1,8 @@
 {
   "session_id": "dd4dd445-8312-4d86-939a-0b3c6226ba28",
   "created": "2025-09-11T07:45:39.602235",
-  "last_activity": "2025-09-11T07:46:33.048267",
-  "total_images_analyzed": 2,
+  "last_activity": "2025-09-11T08:05:30.563053",
+  "total_images_analyzed": 8,
   "conversations": [
     {
       "conversation_id": "ad4c1ce3-3be8-45cd-8137-4acc515e8588",
@@ -67,6 +67,162 @@
             "confianza_porcentaje": "99.7%"
           },
           "recomendacion": "Una botella de plástico puede tardar hasta 450 años en degradarse naturalmente."
+        }
+      ]
+    },
+    {
+      "conversation_id": "549f4b93-9c06-4bc2-93cc-998dd77bd8dc",
+      "timestamp": "2025-09-11T07:55:43.940876",
+      "user_message": {
+        "text": "",
+        "images": [
+          {
+            "tipo": "archivo_subido",
+            "filename": "5d366586-8118-429e-8780-832527e5fc00.jpg",
+            "ruta": "static/uploads\\5d366586-8118-429e-8780-832527e5fc00.jpg",
+            "url_relativa": "/static/uploads/5d366586-8118-429e-8780-832527e5fc00.jpg",
+            "session_id": "dd4dd445-8312-4d86-939a-0b3c6226ba28"
+          },
+          {
+            "tipo": "archivo_subido",
+            "filename": "lata-comida.png",
+            "ruta": "static/uploads\\lata-comida.png",
+            "url_relativa": "/static/uploads/lata-comida.png",
+            "session_id": "dd4dd445-8312-4d86-939a-0b3c6226ba28"
+          }
+        ]
+      },
+      "bot_responses": [
+        {
+          "imagen": {
+            "tipo": "archivo_subido",
+            "filename": "5d366586-8118-429e-8780-832527e5fc00.jpg",
+            "ruta": "static/uploads\\5d366586-8118-429e-8780-832527e5fc00.jpg",
+            "url_relativa": "/static/uploads/5d366586-8118-429e-8780-832527e5fc00.jpg",
+            "session_id": "dd4dd445-8312-4d86-939a-0b3c6226ba28"
+          },
+          "resultado": {
+            "etiqueta": "Plastico",
+            "confianza": 0.9967705011367798,
+            "confianza_porcentaje": "99.7%"
+          },
+          "recomendacion": "Una botella de plástico puede tardar hasta 450 años en degradarse naturalmente."
+        },
+        {
+          "imagen": {
+            "tipo": "archivo_subido",
+            "filename": "lata-comida.png",
+            "ruta": "static/uploads\\lata-comida.png",
+            "url_relativa": "/static/uploads/lata-comida.png",
+            "session_id": "dd4dd445-8312-4d86-939a-0b3c6226ba28"
+          },
+          "resultado": {
+            "etiqueta": "Latas",
+            "confianza": 0.7549908757209778,
+            "confianza_porcentaje": "75.5%"
+          },
+          "recomendacion": "Las latas de aluminio se reciclan infinitas veces sin perder propiedades."
+        }
+      ]
+    },
+    {
+      "conversation_id": "417f69ea-1cff-443d-9c61-86d680135527",
+      "timestamp": "2025-09-11T08:05:30.562948",
+      "user_message": {
+        "text": "https://www.shutterstock.com/image-photo/cardboard-box-isolated-on-white-600nw-2623799423.jpg",
+        "images": [
+          {
+            "tipo": "archivo_subido",
+            "filename": "5d366586-8118-429e-8780-832527e5fc00.jpg",
+            "ruta": "static/uploads\\5d366586-8118-429e-8780-832527e5fc00.jpg",
+            "url_relativa": "/static/uploads/5d366586-8118-429e-8780-832527e5fc00.jpg",
+            "session_id": "dd4dd445-8312-4d86-939a-0b3c6226ba28"
+          },
+          {
+            "tipo": "archivo_subido",
+            "filename": "21-Fabricantes-de-envases-de-vidrio-en-Latinoamerica-1200x675.jpg",
+            "ruta": "static/uploads\\21-Fabricantes-de-envases-de-vidrio-en-Latinoamerica-1200x675.jpg",
+            "url_relativa": "/static/uploads/21-Fabricantes-de-envases-de-vidrio-en-Latinoamerica-1200x675.jpg",
+            "session_id": "dd4dd445-8312-4d86-939a-0b3c6226ba28"
+          },
+          {
+            "tipo": "archivo_subido",
+            "filename": "lata-comida.png",
+            "ruta": "static/uploads\\lata-comida.png",
+            "url_relativa": "/static/uploads/lata-comida.png",
+            "session_id": "dd4dd445-8312-4d86-939a-0b3c6226ba28"
+          },
+          {
+            "tipo": "url_externa",
+            "url_original": "https://www.shutterstock.com/image-photo/cardboard-box-isolated-on-white-600nw-2623799423.jpg",
+            "filename": "imagen_1757599530561.jpg",
+            "ruta": "static/uploads\\imagen_1757599530561.jpg",
+            "url_relativa": "/static/uploads/imagen_1757599530561.jpg",
+            "session_id": "dd4dd445-8312-4d86-939a-0b3c6226ba28"
+          }
+        ]
+      },
+      "bot_responses": [
+        {
+          "imagen": {
+            "tipo": "archivo_subido",
+            "filename": "5d366586-8118-429e-8780-832527e5fc00.jpg",
+            "ruta": "static/uploads\\5d366586-8118-429e-8780-832527e5fc00.jpg",
+            "url_relativa": "/static/uploads/5d366586-8118-429e-8780-832527e5fc00.jpg",
+            "session_id": "dd4dd445-8312-4d86-939a-0b3c6226ba28"
+          },
+          "resultado": {
+            "etiqueta": "Plastico",
+            "confianza": 0.9967705011367798,
+            "confianza_porcentaje": "99.7%"
+          },
+          "recomendacion": "Las tapas pequeñas pueden perderse, manténlas junto al envase si es posible."
+        },
+        {
+          "imagen": {
+            "tipo": "archivo_subido",
+            "filename": "21-Fabricantes-de-envases-de-vidrio-en-Latinoamerica-1200x675.jpg",
+            "ruta": "static/uploads\\21-Fabricantes-de-envases-de-vidrio-en-Latinoamerica-1200x675.jpg",
+            "url_relativa": "/static/uploads/21-Fabricantes-de-envases-de-vidrio-en-Latinoamerica-1200x675.jpg",
+            "session_id": "dd4dd445-8312-4d86-939a-0b3c6226ba28"
+          },
+          "resultado": {
+            "etiqueta": "Vidrio",
+            "confianza": 0.9577725529670715,
+            "confianza_porcentaje": "95.8%"
+          },
+          "recomendacion": "Deposita el vidrio en cualquier momento: los contenedores están disponibles 24/7."
+        },
+        {
+          "imagen": {
+            "tipo": "archivo_subido",
+            "filename": "lata-comida.png",
+            "ruta": "static/uploads\\lata-comida.png",
+            "url_relativa": "/static/uploads/lata-comida.png",
+            "session_id": "dd4dd445-8312-4d86-939a-0b3c6226ba28"
+          },
+          "resultado": {
+            "etiqueta": "Latas",
+            "confianza": 0.7549908757209778,
+            "confianza_porcentaje": "75.5%"
+          },
+          "recomendacion": "Las latas pueden volver a estar en las estanterías en solo 60 días tras el reciclaje."
+        },
+        {
+          "imagen": {
+            "tipo": "url_externa",
+            "url_original": "https://www.shutterstock.com/image-photo/cardboard-box-isolated-on-white-600nw-2623799423.jpg",
+            "filename": "imagen_1757599530561.jpg",
+            "ruta": "static/uploads\\imagen_1757599530561.jpg",
+            "url_relativa": "/static/uploads/imagen_1757599530561.jpg",
+            "session_id": "dd4dd445-8312-4d86-939a-0b3c6226ba28"
+          },
+          "resultado": {
+            "etiqueta": "Carton",
+            "confianza": 0.9748650789260864,
+            "confianza_porcentaje": "97.5%"
+          },
+          "recomendacion": "Separar el cartón del papel ayuda a optimizar el proceso de reciclaje."
         }
       ]
     }
