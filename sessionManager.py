@@ -54,7 +54,7 @@ class SessionManager:
             "created": datetime.now().isoformat(),
             "last_activity": datetime.now().isoformat(),
             "total_images_analyzed": 0,
-            "analyses": []
+            "conversations": []  # Cambio: ahora usamos 'conversations' en lugar de 'analyses'
         }
         
         # Guardar en archivo
@@ -89,6 +89,10 @@ class SessionManager:
                 with open(session_file, 'r', encoding='utf-8') as f:
                     session_data = json.load(f)
                 
+                # Migrar datos antiguos si es necesario
+                if 'analyses' in session_data and 'conversations' not in session_data:
+                    session_data = self._migrate_old_session(session_data)
+                
                 # Actualizar cache
                 self.sessions_cache[session_id] = session_data
                 return session_data
@@ -97,6 +101,34 @@ class SessionManager:
                 return None
         
         return None
+    
+    def _migrate_old_session(self, session_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Migrar sesiones del formato antiguo al nuevo"""
+        print(f"[SESSION] Migrando sesión del formato antiguo al nuevo")
+        
+        conversations = []
+        if 'analyses' in session_data:
+            for analysis in session_data['analyses']:
+                # Convertir análisis individual a conversación
+                conversation = {
+                    "conversation_id": str(uuid.uuid4()),
+                    "timestamp": analysis.get("timestamp"),
+                    "user_message": {
+                        "text": "",
+                        "images": [analysis.get("imagen", {})]
+                    },
+                    "bot_response": {
+                        "resultado": analysis.get("resultado", {}),
+                        "recomendacion": analysis.get("recomendacion", "")
+                    }
+                }
+                conversations.append(conversation)
+            
+            # Remover el campo antiguo
+            del session_data['analyses']
+        
+        session_data['conversations'] = conversations
+        return session_data
     
     def update_session_activity(self, session_id: str) -> bool:
         """
@@ -127,17 +159,16 @@ class SessionManager:
             print(f"[SESSION ERROR] Error al actualizar actividad {session_id}: {e}")
             return False
     
-    def add_analysis_to_session(self, session_id: str, imagen_info: Dict, 
-                               etiqueta: str, confianza: float, recomendacion: str) -> bool:
+    def add_conversation_to_session(self, session_id: str, user_text: str, user_images: list,
+                                   resultados_analisis: list) -> bool:
         """
-        Agregar un análisis a la sesión
+        Agregar una conversación completa a la sesión (mensaje del usuario + respuestas del bot)
         
         Args:
             session_id: ID de la sesión
-            imagen_info: Información de la imagen analizada
-            etiqueta: Resultado de la clasificación
-            confianza: Nivel de confianza
-            recomendacion: Recomendación específica
+            user_text: Texto enviado por el usuario
+            user_images: Lista de información de imágenes enviadas por el usuario
+            resultados_analisis: Lista de tuplas (imagen_info, etiqueta, confianza, recomendacion)
             
         Returns:
             bool: True si se guardó correctamente
@@ -147,21 +178,33 @@ class SessionManager:
             print(f"[SESSION ERROR] Sesión no encontrada: {session_id}")
             return False
         
-        # Crear registro del análisis
-        analisis = {
+        # Crear registro de la conversación completa
+        conversation = {
+            "conversation_id": str(uuid.uuid4()),
             "timestamp": datetime.now().isoformat(),
-            "imagen": imagen_info,
-            "resultado": {
-                "etiqueta": etiqueta,
-                "confianza": float(confianza),
-                "confianza_porcentaje": f"{confianza*100:.1f}%"
+            "user_message": {
+                "text": user_text,
+                "images": user_images
             },
-            "recomendacion": recomendacion
+            "bot_responses": []
         }
         
+        # Agregar todas las respuestas del bot para cada imagen analizada
+        for imagen_info, etiqueta, confianza, recomendacion in resultados_analisis:
+            bot_response = {
+                "imagen": imagen_info,
+                "resultado": {
+                    "etiqueta": etiqueta,
+                    "confianza": float(confianza),
+                    "confianza_porcentaje": f"{confianza*100:.1f}%"
+                },
+                "recomendacion": recomendacion
+            }
+            conversation["bot_responses"].append(bot_response)
+        
         # Agregar al historial de la sesión
-        session_data["analyses"].append(analisis)
-        session_data["total_images_analyzed"] += 1
+        session_data["conversations"].append(conversation)
+        session_data["total_images_analyzed"] += len(resultados_analisis)
         session_data["last_activity"] = datetime.now().isoformat()
         
         # Guardar en archivo
@@ -173,11 +216,24 @@ class SessionManager:
             # Actualizar cache
             self.sessions_cache[session_id] = session_data
             
-            print(f"[SESSION] Análisis agregado a sesión {session_id}: {etiqueta} ({confianza*100:.1f}%)")
+            print(f"[SESSION] Conversación agregada a sesión {session_id}: {len(resultados_analisis)} análisis")
             return True
         except Exception as e:
-            print(f"[SESSION ERROR] Error al guardar análisis en sesión {session_id}: {e}")
+            print(f"[SESSION ERROR] Error al guardar conversación en sesión {session_id}: {e}")
             return False
+    
+    def add_analysis_to_session(self, session_id: str, imagen_info: Dict, 
+                               etiqueta: str, confianza: float, recomendacion: str) -> bool:
+        """
+        Método de compatibilidad - mantener para no romper código existente
+        Se recomienda usar add_conversation_to_session para nuevas implementaciones
+        """
+        return self.add_conversation_to_session(
+            session_id, 
+            "", 
+            [imagen_info], 
+            [(imagen_info, etiqueta, confianza, recomendacion)]
+        )
     
     def cleanup_old_sessions(self) -> int:
         """

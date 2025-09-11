@@ -1,7 +1,6 @@
-# routes.py - Actualizado con soporte de cookies
 import os, time, requests, json, shutil
 from io import BytesIO
-from flask import render_template, request, jsonify, make_response
+from flask import render_template, request, jsonify
 from flask_socketio import SocketIO
 from config import UPLOAD_FOLDER, HISTORIAL_LIVE_FILE
 from model import predecir_imagen
@@ -33,20 +32,22 @@ def register_routes(app):
         resultado = None
         ruta_imagen = None
         ruta_url = None
-        
-        # Obtener session_id de la cookie
-        session_id = request.cookies.get('reciclaje_session_id')
 
         if request.method == "POST":
+            # Obtener o crear session_id
+            session_id = request.form.get('session_id') or request.headers.get('X-Session-ID')
             if not session_id:
                 session_id = session_manager.create_session()
             else:
-                # Verificar que la sesión existe
+                # Verificar que la sesión existe, si no, crear una nueva
                 if session_manager.get_session(session_id) is None:
                     session_id = session_manager.create_session()
             
             # Actualizar actividad de la sesión
             session_manager.update_session_activity(session_id)
+            
+            # Obtener texto del usuario
+            user_text = request.form.get('user_text', '').strip()
             
             archivos = request.files.getlist("imagen")
             urls = request.form.getlist("imagen_url")
@@ -54,7 +55,8 @@ def register_routes(app):
 
             try:
                 resultados_tuplas = []
-                imagenes_info = []  # Para guardar información de cada imagen procesada
+                imagenes_info_user = []  # Información de imágenes para el usuario
+                resultados_analisis = []  # Para guardar en la sesión con formato completo
 
                 # Procesar archivos primero
                 for i, file in enumerate(archivos):
@@ -64,15 +66,21 @@ def register_routes(app):
                         etiqueta, confianza = predecir_imagen(ruta_imagen=ruta_imagen)
                         resultados_tuplas.append((etiqueta, confianza))
                         
-                        # Guardar info de la imagen para el historial
-                        imagen_info = {
+                        # Información de la imagen para el mensaje del usuario
+                        imagen_info_user = {
                             "tipo": "archivo_subido",
                             "filename": file.filename,
                             "ruta": ruta_imagen,
                             "url_relativa": f"/static/uploads/{file.filename}",
                             "session_id": session_id
                         }
-                        imagenes_info.append((imagen_info, etiqueta, confianza))
+                        imagenes_info_user.append(imagen_info_user)
+                        
+                        # Obtener recomendación específica para esta sesión
+                        recomendacion = obtener_recomendacion(etiqueta, session_id)
+                        
+                        # Agregar a resultados para guardar en sesión
+                        resultados_analisis.append((imagen_info_user, etiqueta, confianza, recomendacion))
 
                 # Procesar URLs después
                 for j, url in enumerate(urls):
@@ -87,6 +95,7 @@ def register_routes(app):
                                 imagen_bytes = BytesIO(response.content)
                                 etiqueta, confianza = predecir_imagen(imagen_bytes=imagen_bytes)
                                 resultados_tuplas.append((etiqueta, confianza))
+                                
                                 # Guardar imagen
                                 timestamp = int(time.time() * 1000)
                                 nombre_archivo = f"imagen_{timestamp}.jpg"
@@ -94,7 +103,8 @@ def register_routes(app):
                                 with open(ruta_archivo, "wb") as f:
                                     f.write(response.content)
                                 
-                                imagen_info = {
+                                # Información de la imagen para el mensaje del usuario
+                                imagen_info_user = {
                                     "tipo": "url_externa",
                                     "url_original": url,
                                     "filename": nombre_archivo,
@@ -102,7 +112,13 @@ def register_routes(app):
                                     "url_relativa": f"/static/uploads/{nombre_archivo}",
                                     "session_id": session_id
                                 }
-                                imagenes_info.append((imagen_info, etiqueta, confianza))
+                                imagenes_info_user.append(imagen_info_user)
+                                
+                                # Obtener recomendación específica para esta sesión
+                                recomendacion = obtener_recomendacion(etiqueta, session_id)
+                                
+                                # Agregar a resultados para guardar en sesión
+                                resultados_analisis.append((imagen_info_user, etiqueta, confianza, recomendacion))
                             else:
                                 resultados_lista.append(f"No se pudo descargar la imagen desde {url}")
                         else:
@@ -111,13 +127,20 @@ def register_routes(app):
                                 etiqueta, confianza = predecir_imagen(ruta_imagen=url)
                                 resultados_tuplas.append((etiqueta, confianza))
                                 
-                                imagen_info = {
+                                # Información de la imagen para el mensaje del usuario
+                                imagen_info_user = {
                                     "tipo": "ruta_local",
                                     "ruta_original": url,
                                     "filename": os.path.basename(url),
                                     "session_id": session_id
                                 }
-                                imagenes_info.append((imagen_info, etiqueta, confianza))
+                                imagenes_info_user.append(imagen_info_user)
+                                
+                                # Obtener recomendación específica para esta sesión
+                                recomendacion = obtener_recomendacion(etiqueta, session_id)
+                                
+                                # Agregar a resultados para guardar en sesión
+                                resultados_analisis.append((imagen_info_user, etiqueta, confianza, recomendacion))
                             else:
                                 resultados_lista.append(f"La ruta local no existe: {url}")
                     except Exception as e:
@@ -127,52 +150,24 @@ def register_routes(app):
                 if resultados_tuplas:
                     resultado, recomendaciones_individuales = generar_texto_recomendaciones(resultados_tuplas, session_id)
                     
-                    # Guardar en historial de la sesión cada imagen con su recomendación específica
-                    for i, ((imagen_info, etiqueta, confianza), recomendacion) in enumerate(zip(imagenes_info, recomendaciones_individuales)):
-                        session_manager.add_analysis_to_session(session_id, imagen_info, etiqueta, confianza, recomendacion)
+                    # Guardar conversación completa en la sesión (NUEVO: incluye mensaje del usuario)
+                    session_manager.add_conversation_to_session(
+                        session_id, 
+                        user_text,  # Texto del usuario
+                        imagenes_info_user,  # Imágenes enviadas por el usuario
+                        resultados_analisis  # Resultados del análisis con recomendaciones
+                    )
 
                 # Si es petición AJAX (Fetch)
                 if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-                    response = jsonify({"resultado": resultado, "session_id": session_id})
-                    # Setear cookie si es nueva sesión
-                    if not request.cookies.get('reciclaje_session_id'):
-                        response.set_cookie('reciclaje_session_id', session_id, 
-                                          max_age=30*24*60*60,  # 30 días
-                                          httponly=True,
-                                          samesite='Lax')
-                    return response
+                    return jsonify({"resultado": resultado, "session_id": session_id})
 
             except Exception as e:
                 if request.headers.get("X-Requested-With") == "XMLHttpRequest":
                     return jsonify({"resultado": f"Error al procesar la imagen: {e}", "session_id": session_id})
                 resultado = f"Error al procesar la imagen: {e}"
 
-        # Preparar respuesta
-        response = make_response(render_template("index.html", resultado=resultado, ruta_imagen=ruta_imagen, ruta_url=ruta_url))
-        
-        # Setear cookie si es nueva sesión y no existe cookie
-        if not session_id:
-            session_id = session_manager.create_session()
-            response.set_cookie('reciclaje_session_id', session_id, 
-                              max_age=30*24*60*60,  # 30 días
-                              httponly=True,
-                              samesite='Lax')
-        
-        return response
-
-    @app.route("/nueva_sesion", methods=["POST"])
-    def crear_nueva_sesion():
-        """Crear una nueva sesión para un usuario"""
-        try:
-            session_id = session_manager.create_session()
-            response = jsonify({"success": True, "session_id": session_id})
-            response.set_cookie('reciclaje_session_id', session_id, 
-                              max_age=30*24*60*60,  # 30 días
-                              httponly=True,
-                              samesite='Lax')
-            return response
-        except Exception as e:
-            return jsonify({"success": False, "error": str(e)})
+        return render_template("index.html", resultado=resultado, ruta_imagen=ruta_imagen, ruta_url=ruta_url)
 
     @app.route("/analizar_url", methods=["GET"])
     def analizar_url():
@@ -258,11 +253,9 @@ def register_routes(app):
     @app.route("/historial")
     def ver_historial():
         """Endpoint para ver el historial de análisis de una sesión específica"""
-        # Obtener session_id de la cookie en lugar de query parameter
-        session_id = request.cookies.get('reciclaje_session_id')
-        
+        session_id = request.args.get('session_id')
         if not session_id:
-            return jsonify({"error": "No hay sesión activa"})
+            return jsonify({"error": "Se requiere session_id"})
         
         try:
             session_data = session_manager.get_session(session_id)

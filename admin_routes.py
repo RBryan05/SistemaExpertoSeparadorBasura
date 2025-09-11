@@ -36,13 +36,26 @@ def register_admin_routes(app):
                         with open(session_path, 'r', encoding='utf-8') as f:
                             session_data = json.load(f)
                         
+                        # Compatibilidad con formato nuevo y antiguo
+                        total_conversations = 0
+                        total_analyses = session_data.get("total_images_analyzed", 0)
+                        
+                        if 'conversations' in session_data:
+                            total_conversations = len(session_data['conversations'])
+                        elif 'analyses' in session_data:
+                            # Formato antiguo - migrar temporalmente para mostrar stats
+                            total_conversations = len(session_data['analyses'])
+                        
                         session_details.append({
                             "session_id": session_data.get("session_id"),
                             "created": session_data.get("created"),
                             "last_activity": session_data.get("last_activity"),
-                            "total_analyses": session_data.get("total_images_analyzed", 0)
+                            "total_conversations": total_conversations,
+                            "total_analyses": total_analyses,
+                            "format": "nuevo" if 'conversations' in session_data else "antiguo"
                         })
-                    except:
+                    except Exception as e:
+                        print(f"[ADMIN] Error al procesar {session_file}: {e}")
                         continue
             
             # Estadísticas live
@@ -63,7 +76,8 @@ def register_admin_routes(app):
                 },
                 "sistema": {
                     "cleanup_hours": session_stats["cleanup_hours"],
-                    "directorio_sesiones": sessions_dir
+                    "directorio_sesiones": sessions_dir,
+                    "nuevo_formato": "Incluye mensajes del usuario y conversaciones completas"
                 }
             })
         except Exception as e:

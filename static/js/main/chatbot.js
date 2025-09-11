@@ -1,4 +1,4 @@
-// chatbot.js - Actualizado para sistema de cookies
+// chatbot.js - Actualizado para enviar texto del usuario al historial
 import { HistorialManager } from './historialManager.js';
 import { bindChatEvents } from './chatEvents.js';
 import { addUserMessage, addBotMessage, showCancelButton, showSendButton } from './chatUI.js';
@@ -34,30 +34,34 @@ export class ChatBot {
         bindChatEvents(this);
         this.adjustTextareaHeight();
 
-        // Inicializar sesión (las cookies se manejan automáticamente)
+        // Esperar a que se inicialice la sesión
         await this.backendService.initializeSession();
 
         // Mostrar información de sesión en consola para debugging
-        console.log('[CHATBOT] Sistema de cookies activado');
-        console.log('[CHATBOT] Tu historial se mantendrá entre sesiones');
+        console.log('[CHATBOT] Sesión inicializada:', this.backendService.getSessionId());
 
-        // Mostrar mensaje de bienvenida
+        // Mostrar mensaje de bienvenida con información de sesión
         this.mostrarMensajeSesion();
     }
 
     mostrarMensajeSesion() {
-        console.log('[SESIÓN] 🔒 Tu historial es persistente (cookies activadas)');
-        console.log('[SESIÓN] 📅 Tu sesión se mantendrá por 30 días');
-        console.log('[SESIÓN] ⏰ El servidor limpia sesiones inactivas después de 24h');
+        const sessionId = this.backendService.getSessionId();
+        const shortSessionId = sessionId ? sessionId.substring(0, 8) : 'N/A';
+
+        console.log(`[SESIÓN] Tu sesión personal: ${shortSessionId}...`);
+        console.log('[SESIÓN] Tus análisis son privados y se guardan solo para ti');
+        console.log('[SESIÓN] La sesión se limpia automáticamente después de 24h de inactividad');
 
         // Opcional: Agregar indicador visual en la UI
-        this.actualizarIndicadorSesion();
+        this.actualizarIndicadorSesion(shortSessionId);
     }
 
-    actualizarIndicadorSesion() {
+    actualizarIndicadorSesion(shortSessionId) {
+        // Buscar si ya existe el indicador
         let indicador = document.querySelector('.session-indicator');
 
         if (!indicador) {
+            // Crear indicador de sesión
             indicador = document.createElement('div');
             indicador.className = 'session-indicator';
             indicador.style.cssText = `
@@ -72,21 +76,18 @@ export class ChatBot {
                 z-index: 1000;
                 backdrop-filter: blur(10px);
                 border: 1px solid rgba(255, 255, 255, 0.1);
+                transition: opacity 0.3s ease;
             `;
             document.body.appendChild(indicador);
+
+            // Ocultar después de 5 segundos
+            setTimeout(() => {
+                indicador.style.opacity = '0';
+                setTimeout(() => indicador.remove(), 300);
+            }, 5000);
         }
 
-        indicador.innerHTML = '🔒 Sesión persistente activada';
-
-        // Ocultar después de 5 segundos
-        setTimeout(() => {
-            indicador.style.opacity = '0';
-            setTimeout(() => {
-                if (indicador.parentNode) {
-                    indicador.parentNode.removeChild(indicador);
-                }
-            }, 300);
-        }, 5000);
+        indicador.innerHTML = `🔒 Sesión: ${shortSessionId}`;
     }
 
     adjustTextareaHeight() {
@@ -152,10 +153,19 @@ export class ChatBot {
         const typingDiv = addBotMessage(this, '', [], true);
 
         try {
-            const response = await this.backendService.sendImages(imagesToSend);
+            // NUEVO: Enviar también el texto del usuario al backend
+            const response = await this.backendService.sendImages(imagesToSend, cleanText);
             typingDiv.remove();
             showCancelButton(this, true);
             addBotMessage(this, response.resultado, [], false, true);
+            
+            // Log para debugging
+            console.log('[CHATBOT] Mensaje enviado:', {
+                texto_usuario: cleanText,
+                imagenes: imagesToSend.length,
+                session_id: this.backendService.getSessionId()
+            });
+            
         } catch (error) {
             typingDiv.remove();
             addBotMessage(this, 'Lo siento, hubo un error al procesar la imagen. Intenta de nuevo.', [], false, false);
@@ -205,7 +215,22 @@ También acepto enlaces de imágenes y texto descriptivo. ¡Empezamos a cuidar e
 
     // Método para obtener el historial de la sesión actual
     async obtenerHistorialSesion() {
-        return await this.backendService.getSessionHistory();
+        const historial = await this.backendService.getSessionHistory();
+        
+        // Log detallado del historial para debugging
+        if (historial && historial.conversations) {
+            console.log('[CHATBOT] Historial de conversaciones:');
+            historial.conversations.forEach((conv, idx) => {
+                console.log(`[CONV ${idx + 1}]`, {
+                    timestamp: conv.timestamp,
+                    texto_usuario: conv.user_message.text,
+                    imagenes_usuario: conv.user_message.images.length,
+                    respuestas_bot: conv.bot_responses.length
+                });
+            });
+        }
+        
+        return historial;
     }
 
     // Delegación al ImageModal

@@ -1,7 +1,6 @@
-// historialManager.js - Gestor actualizado para el historial con sesiones
+// historialManager.js - Gestor actualizado para el historial con conversaciones completas
 export class HistorialManager {
     
-    // NOTA: Ya no necesitamos reiniciar historial porque cada sesión es única
     static async obtenerHistorial(sessionId) {
         if (!sessionId) {
             console.warn('[HISTORIAL] No se proporcionó session_id');
@@ -55,7 +54,7 @@ export class HistorialManager {
         }
     }
 
-    // Método para mostrar información de la sesión actual en consola
+    // Método mejorado para mostrar información detallada de la sesión actual en consola
     static async mostrarInfoSesion(sessionId) {
         if (!sessionId) {
             console.log('[SESIÓN] No hay sesión activa');
@@ -64,21 +63,96 @@ export class HistorialManager {
 
         const historial = await this.obtenerHistorial(sessionId);
         if (historial) {
-            console.log('[SESIÓN] Información de sesión actual:', {
-                session_id: historial.session_id,
-                creada: historial.created,
-                última_actividad: historial.last_activity,
-                imágenes_analizadas: historial.total_images_analyzed,
-                análisis: historial.analyses.length
-            });
+            console.group('🔍 INFORMACIÓN DETALLADA DE SESIÓN');
+            console.log('📝 ID de sesión:', historial.session_id);
+            console.log('📅 Creada:', new Date(historial.created).toLocaleString());
+            console.log('🕐 Última actividad:', new Date(historial.last_activity).toLocaleString());
+            console.log('📸 Imágenes analizadas:', historial.total_images_analyzed);
+            
+            // Información sobre conversaciones
+            if (historial.conversations && historial.conversations.length > 0) {
+                console.log('💬 Total conversaciones:', historial.conversations.length);
+                
+                console.group('📋 Resumen de Conversaciones');
+                historial.conversations.forEach((conv, idx) => {
+                    const timestamp = new Date(conv.timestamp).toLocaleString();
+                    const userText = conv.user_message.text || '[Sin texto]';
+                    const userImages = conv.user_message.images.length;
+                    const botResponses = conv.bot_responses.length;
+                    
+                    console.log(`${idx + 1}. [${timestamp}]`);
+                    console.log(`   👤 Usuario: "${userText}" + ${userImages} imagen(es)`);
+                    console.log(`   🤖 Bot: ${botResponses} respuesta(s)`);
+                    
+                    // Mostrar las clasificaciones del bot
+                    conv.bot_responses.forEach((resp, respIdx) => {
+                        console.log(`      ${respIdx + 1}. ${resp.resultado.etiqueta} (${resp.resultado.confianza_porcentaje})`);
+                    });
+                });
+                console.groupEnd();
+            } else if (historial.analyses && historial.analyses.length > 0) {
+                // Compatibilidad con formato antiguo
+                console.log('📊 Análisis (formato antiguo):', historial.analyses.length);
+                console.warn('⚠️ Esta sesión usa el formato antiguo. Los mensajes del usuario no están registrados.');
+            } else {
+                console.log('📊 No hay conversaciones registradas');
+            }
+            
+            console.groupEnd();
         }
     }
 
-    // Ya no necesitamos inicializar historial en nueva sesión
-    // porque cada sesión es independiente desde el momento de creación
+    // Nuevo método para mostrar conversaciones de forma legible
+    static async mostrarConversaciones(sessionId, limite = 10) {
+        const historial = await this.obtenerHistorial(sessionId);
+        
+        if (!historial || !historial.conversations) {
+            console.log('[CONVERSACIONES] No hay conversaciones disponibles');
+            return;
+        }
+
+        const conversaciones = historial.conversations.slice(-limite); // Mostrar las últimas N
+        
+        console.group(`💬 ÚLTIMAS ${conversaciones.length} CONVERSACIONES`);
+        
+        conversaciones.forEach((conv, idx) => {
+            const numero = historial.conversations.length - conversaciones.length + idx + 1;
+            const timestamp = new Date(conv.timestamp).toLocaleString();
+            
+            console.group(`📝 Conversación ${numero} - ${timestamp}`);
+            
+            // Mensaje del usuario
+            console.log('👤 USUARIO:');
+            if (conv.user_message.text) {
+                console.log(`   📝 Texto: "${conv.user_message.text}"`);
+            }
+            if (conv.user_message.images && conv.user_message.images.length > 0) {
+                console.log(`   🖼️ Imágenes: ${conv.user_message.images.length}`);
+                conv.user_message.images.forEach((img, imgIdx) => {
+                    console.log(`      ${imgIdx + 1}. ${img.tipo}: ${img.filename || img.url_original || img.ruta_original}`);
+                });
+            }
+            
+            // Respuestas del bot
+            console.log('🤖 BOT:');
+            conv.bot_responses.forEach((resp, respIdx) => {
+                console.log(`   ${respIdx + 1}. Clasificación: ${resp.resultado.etiqueta} (${resp.resultado.confianza_porcentaje})`);
+                console.log(`      💡 Recomendación: ${resp.recomendacion.substring(0, 100)}${resp.recomendacion.length > 100 ? '...' : ''}`);
+            });
+            
+            console.groupEnd();
+        });
+        
+        if (historial.conversations.length > limite) {
+            console.log(`... y ${historial.conversations.length - limite} conversaciones más`);
+        }
+        
+        console.groupEnd();
+    }
+
     static async inicializarHistorialEnNuevaSesion() {
         console.log('[HISTORIAL] Sistema de sesiones individuales inicializado');
-        // Este método se mantiene por compatibilidad pero ya no hace falta limpiar
+        console.log('[HISTORIAL] Ahora se guardan conversaciones completas: texto del usuario + respuestas del bot');
     }
 
     // Método para limpiar solo el cache local del navegador (no afecta al servidor)
@@ -93,6 +167,26 @@ export class HistorialManager {
             const response = await fetch('/admin/estadisticas_detalladas');
             if (response.ok) {
                 const stats = await response.json();
+                
+                // Mostrar información detallada en consola
+                console.group('📊 ESTADÍSTICAS DETALLADAS DEL SISTEMA');
+                console.log(`🏠 Sesiones activas: ${stats.sesiones.total_activas}`);
+                console.log(`📸 Total análisis en sesiones: ${stats.sesiones.total_analisis}`);
+                console.log(`📡 Total análisis live: ${stats.live.total_analisis}`);
+                console.log(`🧹 Limpieza automática cada: ${stats.sistema.cleanup_hours} horas`);
+                console.log(`✨ ${stats.sistema.nuevo_formato}`);
+                
+                if (stats.sesiones.detalles && stats.sesiones.detalles.length > 0) {
+                    console.group('📋 Detalles por Sesión');
+                    stats.sesiones.detalles.forEach(sesion => {
+                        const formatoIcon = sesion.format === 'nuevo' ? '✅' : '⚠️';
+                        console.log(`${formatoIcon} ${sesion.session_id.substring(0, 8)}... | 💬 ${sesion.total_conversations} conv. | 📸 ${sesion.total_analyses} análisis | 🕐 ${new Date(sesion.last_activity).toLocaleString()}`);
+                    });
+                    console.groupEnd();
+                }
+                
+                console.groupEnd();
+                
                 return stats;
             } else {
                 console.warn('[ADMIN] Error al obtener estadísticas detalladas');
