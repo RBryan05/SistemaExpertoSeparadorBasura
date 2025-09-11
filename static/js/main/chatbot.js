@@ -1,4 +1,4 @@
-// chatbot.js
+// chatbot.js - Actualizado para el sistema de sesiones
 import { HistorialManager } from './historialManager.js';
 import { bindChatEvents } from './chatEvents.js';
 import { addUserMessage, addBotMessage, showCancelButton, showSendButton } from './chatUI.js';
@@ -30,10 +30,64 @@ export class ChatBot {
         this.originalButtonHTML = this.sendBtn.innerHTML;
     }
 
-    initialize() {
+    async initialize() {
         bindChatEvents(this);
         this.adjustTextareaHeight();
-        this.reiniciarHistorial(); // Reiniciar historial al cargar la página
+
+        // Esperar a que se inicialice la sesión
+        await this.backendService.initializeSession();
+
+        // Mostrar información de sesión en consola para debugging
+        console.log('[CHATBOT] Sesión inicializada:', this.backendService.getSessionId());
+
+        // Mostrar mensaje de bienvenida con información de sesión
+        this.mostrarMensajeSesion();
+    }
+
+    mostrarMensajeSesion() {
+        const sessionId = this.backendService.getSessionId();
+        const shortSessionId = sessionId ? sessionId.substring(0, 8) : 'N/A';
+
+        console.log(`[SESIÓN] Tu sesión personal: ${shortSessionId}...`);
+        console.log('[SESIÓN] Tus análisis son privados y se guardan solo para ti');
+        console.log('[SESIÓN] La sesión se limpia automáticamente después de 24h de inactividad');
+
+        // Opcional: Agregar indicador visual en la UI
+        this.actualizarIndicadorSesion(shortSessionId);
+    }
+
+    actualizarIndicadorSesion(shortSessionId) {
+        // Buscar si ya existe el indicador
+        let indicador = document.querySelector('.session-indicator');
+
+        if (!indicador) {
+            // Crear indicador de sesión
+            indicador = document.createElement('div');
+            indicador.className = 'session-indicator';
+            indicador.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background: rgba(0, 0, 0, 0.7);
+                color: #fff;
+                padding: 8px 12px;
+                border-radius: 20px;
+                font-size: 12px;
+                z-index: 1000;
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                transition: opacity 0.3s ease;
+            `;
+            document.body.appendChild(indicador);
+
+            // Ocultar después de 5 segundos
+            setTimeout(() => {
+                indicador.style.opacity = '0';
+                setTimeout(() => indicador.remove(), 300);
+            }, 5000);
+        }
+
+        indicador.innerHTML = `🔒 Sesión: ${shortSessionId}`;
     }
 
     adjustTextareaHeight() {
@@ -112,8 +166,47 @@ export class ChatBot {
         }
     }
 
-    async reiniciarHistorial() {
-        await HistorialManager.inicializarHistorialEnNuevaSesion();
+    // Método para reiniciar conversación (crear nueva sesión)
+    async reiniciarConversacion() {
+        try {
+            const nuevaSessionId = await this.backendService.resetSession();
+
+            // Limpiar chat visualmente
+            this.chatMessages.innerHTML = '';
+
+            // Agregar mensaje de bienvenida
+            addBotMessage(this, `¡Hola! 👋 Soy EcoBot, tu asistente inteligente para clasificar materiales reciclables.
+
+✨ Puedes subir imágenes de objetos o compartir su url y te diré si son de:
+
+• 📦 Cartón
+• 🥤 Latas
+• 📄 Papel
+• 🍶 Plástico
+• 🍷 Vidrio
+
+También acepto enlaces de imágenes y texto descriptivo. ¡Empezamos a cuidar el planeta juntos! 🌍♻️`, [], false, false);
+
+            this.mostrarMensajeSesion();
+
+            console.log('[CHATBOT] Conversación reiniciada con nueva sesión:', nuevaSessionId);
+            return true;
+        } catch (error) {
+            console.error('[CHATBOT] Error al reiniciar conversación:', error);
+            return false;
+        }
+    }
+
+    // Método para obtener información de la sesión actual
+    async obtenerInfoSesion() {
+        const sessionId = this.backendService.getSessionId();
+        await HistorialManager.mostrarInfoSesion(sessionId);
+        return sessionId;
+    }
+
+    // Método para obtener el historial de la sesión actual
+    async obtenerHistorialSesion() {
+        return await this.backendService.getSessionHistory();
     }
 
     // Delegación al ImageModal

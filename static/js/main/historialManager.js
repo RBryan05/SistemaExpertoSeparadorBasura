@@ -1,35 +1,20 @@
-// historialManager.js - Gestor para el historial de análisis
+// historialManager.js - Gestor actualizado para el historial con sesiones
 export class HistorialManager {
-    static async reiniciarHistorial() {
-        try {
-            const response = await fetch('/reiniciar_historial', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-            const result = await response.json();
-            if (result.success) {
-                console.log('[HISTORIAL] Historial reiniciado para nueva sesión');
-                return true;
-            } else {
-                console.warn('[HISTORIAL] Error al reiniciar historial:', result.error);
-                return false;
-            }
-        } catch (error) {
-            console.warn('[HISTORIAL] Error de conexión al reiniciar historial:', error);
-            return false;
+    
+    // NOTA: Ya no necesitamos reiniciar historial porque cada sesión es única
+    static async obtenerHistorial(sessionId) {
+        if (!sessionId) {
+            console.warn('[HISTORIAL] No se proporcionó session_id');
+            return null;
         }
-    }
 
-    static async obtenerHistorial() {
         try {
-            const response = await fetch('/historial');
+            const response = await fetch(`/historial?session_id=${sessionId}`);
             if (response.ok) {
                 const historial = await response.json();
                 return historial;
             } else {
-                console.warn('[HISTORIAL] Error al obtener historial');
+                console.warn('[HISTORIAL] Error al obtener historial para sesión:', sessionId);
                 return null;
             }
         } catch (error) {
@@ -38,13 +23,84 @@ export class HistorialManager {
         }
     }
 
+    static async obtenerEstadisticas() {
+        try {
+            const response = await fetch('/estadisticas_historial');
+            if (response.ok) {
+                const stats = await response.json();
+                return stats;
+            } else {
+                console.warn('[ESTADÍSTICAS] Error al obtener estadísticas');
+                return null;
+            }
+        } catch (error) {
+            console.warn('[ESTADÍSTICAS] Error de conexión:', error);
+            return null;
+        }
+    }
+
+    static async obtenerHistorialLive() {
+        try {
+            const response = await fetch('/historial_live');
+            if (response.ok) {
+                const historial = await response.json();
+                return historial;
+            } else {
+                console.warn('[HISTORIAL LIVE] Error al obtener historial live');
+                return null;
+            }
+        } catch (error) {
+            console.warn('[HISTORIAL LIVE] Error de conexión:', error);
+            return null;
+        }
+    }
+
+    // Método para mostrar información de la sesión actual en consola
+    static async mostrarInfoSesion(sessionId) {
+        if (!sessionId) {
+            console.log('[SESIÓN] No hay sesión activa');
+            return;
+        }
+
+        const historial = await this.obtenerHistorial(sessionId);
+        if (historial) {
+            console.log('[SESIÓN] Información de sesión actual:', {
+                session_id: historial.session_id,
+                creada: historial.created,
+                última_actividad: historial.last_activity,
+                imágenes_analizadas: historial.total_images_analyzed,
+                análisis: historial.analyses.length
+            });
+        }
+    }
+
+    // Ya no necesitamos inicializar historial en nueva sesión
+    // porque cada sesión es independiente desde el momento de creación
     static async inicializarHistorialEnNuevaSesion() {
-        // Detectar si es una nueva sesión (recarga de página)
-        const esNuevaSesion = !sessionStorage.getItem('historial_inicializado');
-        
-        if (esNuevaSesion) {
-            await this.reiniciarHistorial();
-            sessionStorage.setItem('historial_inicializado', 'true');
+        console.log('[HISTORIAL] Sistema de sesiones individuales inicializado');
+        // Este método se mantiene por compatibilidad pero ya no hace falta limpiar
+    }
+
+    // Método para limpiar solo el cache local del navegador (no afecta al servidor)
+    static limpiarCacheLocal() {
+        sessionStorage.removeItem('chatbot_session_id');
+        console.log('[HISTORIAL] Cache local limpiado');
+    }
+
+    // Método administrativo para obtener estadísticas detalladas
+    static async obtenerEstadisticasDetalladas() {
+        try {
+            const response = await fetch('/admin/estadisticas_detalladas');
+            if (response.ok) {
+                const stats = await response.json();
+                return stats;
+            } else {
+                console.warn('[ADMIN] Error al obtener estadísticas detalladas');
+                return null;
+            }
+        } catch (error) {
+            console.warn('[ADMIN] Error de conexión:', error);
+            return null;
         }
     }
 }
