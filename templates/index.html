@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0a0a0f">
+    <meta name="color-scheme" content="dark">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Clasificador de Basura - ChatBot</title>
+    
+    <!-- Importar el CSS principal que incluye todos los módulos -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index/main.css') }}">
+</head>
+
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="header-content">
+                <div class="bot-avatar">🤖</div>
+                <div class="header-text">
+                    <h1>EcoBot</h1>
+                    <p>Clasificador inteligente de materiales reciclables</p>
+                </div>
+            </div>
+            <!-- Botón de análisis en vivo mejorado -->
+            <button class="live-analysis-btn" onclick="window.open('/live', '_blank')" title="Ver estadísticas en tiempo real">
+                <span class="btn-icon">📊</span>
+                <span class="btn-text">Análisis en vivo</span>
+            </button>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot-message">
+                <div class="message-avatar">🤖</div>
+                <div class="message-content">
+                    <div class="message-text liquid-glass">
+                        ¡Hola! 👋 Soy EcoBot, tu asistente inteligente para clasificar materiales reciclables.<br>
+                        <br>
+                        ✨ Puedes subir imágenes de objetos o compartir su url y te diré si son de:<br>
+                        <br>
+                        • 📦 Cartón<br>
+                        • 🥤 Latas<br>
+                        • 📄 Papel<br>
+                        • 🍶 Plástico<br>
+                        • 🍷 Vidrio<br>
+                        <br>
+                        También acepto enlaces de imágenes y texto descriptivo. ¡Empezamos a cuidar el planeta juntos! 🌍♻️
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <div class="image-preview-container" id="imagePreviewContainer"></div>
+
+            <div class="input-container">
+                <input type="file" id="fileInput" multiple accept="image/*" style="display: none;">
+
+                <button class="attach-btn" id="attachBtn" title="Subir imágenes">
+                    📎
+                </button>
+
+                <div class="text-input-container">
+                    <textarea id="messageInput" placeholder="Agregar imagen para analizar..."
+                        rows="1"></textarea>
+                </div>
+
+                <button class="send-btn" id="sendBtn" title="Enviar mensaje">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m22 2-7 20-4-9-9-4 20-7z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resultado de análisis (oculto, solo para JS) -->
+    {% if resultado %}
+    <div class="resultado" style="display:none;">
+        <strong>Resultado:</strong> {{ resultado }}
+    </div>
+    {% endif %}
+
+    <script type="module" src="{{ url_for('static', filename='js/main/main.js') }}"></script>
+
+</body>
+
+</html>

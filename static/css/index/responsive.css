@@ -1,0 +1,252 @@
+/* responsive.css - Media queries y diseño responsive */
+
+/* Tablets y pantallas medianas */
+@media (max-width: 768px) {
+    .chat-container {
+        height: 100vh;
+        border-radius: 0;
+        /* Agregamos padding-top para evitar solapamiento con la barra del navegador */
+        padding-top: env(safe-area-inset-top);
+    }
+    
+    .chat-header {
+        padding: var(--spacing-md) 15px;
+        /* Aseguramos que no se solape con la barra de estado */
+        padding-top: max(var(--spacing-md), env(safe-area-inset-top, 12px));
+    }
+    
+    .message-content {
+        max-width: 85%;
+    }
+    
+    .input-container {
+        padding: 15px;
+        gap: var(--spacing-sm);
+        /* Agregamos padding-bottom para dispositivos con home indicator */
+        padding-bottom: max(15px, env(safe-area-inset-bottom, 15px));
+    }
+    
+    .header-text h1 {
+        font-size: 20px;
+    }
+    
+    .header-text p {
+        font-size: 13px;
+    }
+
+    .live-analysis-btn {
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: 12px;
+        gap: 6px;
+    }
+    
+    .live-analysis-btn .btn-icon {
+        font-size: 14px;
+    }
+}
+
+/* Móviles pequeños */
+@media (max-width: 480px) {
+    .chat-container {
+        /* Aseguramos que use toda la pantalla en móviles */
+        height: 100vh;
+        height: 100dvh; /* Dynamic viewport height para mejor soporte */
+    }
+    
+    .chat-header {
+        padding: 8px 12px;
+        /* Manejo más agresivo del safe area en móviles pequeños */
+        padding-top: max(8px, env(safe-area-inset-top, 8px));
+        flex-wrap: nowrap; /* Evitamos que se envuelvan los elementos */
+    }
+    
+    .header-content {
+        gap: 10px;
+        min-width: 0;
+        flex: 1;
+    }
+    
+    .bot-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+    
+    .header-text h1 {
+        font-size: 18px;
+    }
+    
+    .header-text p {
+        font-size: 12px;
+        display: none; /* Ocultamos el subtítulo en pantallas muy pequeñas */
+    }
+    
+    .chat-messages {
+        padding: 15px 12px;
+    }
+    
+    .message-content {
+        max-width: 90%;
+    }
+    
+    .input-container {
+        padding: 10px 12px;
+        /* Importante: padding bottom para home indicator */
+        padding-bottom: max(12px, env(safe-area-inset-bottom, 12px));
+        gap: var(--spacing-sm);
+    }
+    
+    .attach-btn, .send-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 20px;
+        font-size: 16px;
+    }
+    
+    #messageInput {
+        padding: 12px 16px;
+        font-size: 16px; /* Evita zoom en iOS */
+        min-height: 44px; /* Mantiene altura cómoda en móviles */
+    }
+
+    .live-analysis-btn {
+        padding: 6px 10px;
+        font-size: 11px;
+        border-radius: 15px;
+        gap: var(--spacing-xs);
+        min-width: 40px; /* Asegura un tamaño mínimo */
+    }
+    
+    .live-analysis-btn .btn-text {
+        display: none; /* Ocultar texto en móviles muy pequeños */
+    }
+    
+    .live-analysis-btn .btn-icon {
+        font-size: 16px;
+    }
+    
+    .message-image {
+        max-width: 150px;
+        max-height: 100px;
+    }
+}
+
+/* iPhone específicos (notch y Dynamic Island) */
+@media (max-width: 430px) and (max-height: 932px) {
+    .chat-header {
+        /* Espaciado específico para iPhone con notch/Dynamic Island */
+        padding-top: max(12px, env(safe-area-inset-top, 12px));
+    }
+    
+    .input-container {
+        /* Espaciado específico para home indicator */
+        padding-bottom: max(15px, env(safe-area-inset-bottom, 15px));
+    }
+}
+
+/* Landscape en móviles */
+@media (max-height: 500px) and (orientation: landscape) {
+    .chat-header {
+        padding: var(--spacing-sm) 15px;
+        padding-top: max(var(--spacing-sm), env(safe-area-inset-top, 8px));
+    }
+    
+    .header-text p {
+        display: none;
+    }
+    
+    .bot-avatar {
+        width: 35px;
+        height: 35px;
+        font-size: 18px;
+    }
+    
+    .input-container {
+        padding: var(--spacing-sm) 15px;
+        padding-bottom: max(var(--spacing-sm), env(safe-area-inset-bottom, 8px));
+    }
+}
+
+/* Ajustes para dispositivos táctiles */
+@media (hover: none) and (pointer: coarse) {
+    .attach-btn,
+    .send-btn,
+    .live-analysis-btn {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    .message-image {
+        cursor: default;
+    }
+}
+
+/* Modo oscuro forzado para mejor experiencia */
+@media (prefers-color-scheme: dark) {
+    :root {
+        color-scheme: dark;
+    }
+}
+
+/* Reducir animaciones si el usuario las prefiere reducidas */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    .bot-message .message-text::before,
+    .user-message .message-text::before {
+        display: none;
+    }
+}
+
+/* Optimización para pantallas de alta densidad */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .bot-avatar,
+    .message-avatar {
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+    }
+}
+
+/* Ajustes específicos para dispositivos plegables */
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+    .chat-container {
+        max-width: 90%;
+        margin: 0 auto;
+    }
+    
+    .message-content {
+        max-width: 75%;
+    }
+}
+
+/* Soporte para modo picture-in-picture o ventanas pequeñas */
+@media (max-width: 320px) {
+    .header-text h1 {
+        font-size: 16px;
+    }
+    
+    .live-analysis-btn .btn-text {
+        display: none;
+    }
+    
+    .live-analysis-btn {
+        min-width: 36px;
+        padding: 6px;
+    }
+    
+    .message-content {
+        max-width: 95%;
+    }
+    
+    .attach-btn, .send-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+    }
+}

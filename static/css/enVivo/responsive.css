@@ -1,0 +1,140 @@
+/* Responsive para tablets */
+@media (max-width: 1024px) {
+    .live-container {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
+    }
+
+    .results-panel {
+        order: -1;
+    }
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+    .live-header {
+        padding: 16px;
+    }
+
+    .header-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+    }
+
+    .status-indicator {
+        align-self: center;
+    }
+
+    .header-title {
+        font-size: 24px;
+    }
+
+    .live-container {
+        padding: 16px;
+        gap: 16px;
+    }
+
+    .result-card {
+        padding: 20px;
+    }
+
+    .stats-container {
+        gap: 20px;
+    }
+
+    .stat-value {
+        font-size: 18px;
+    }
+}
+
+/* Responsive para pantallas pequeñas */
+@media (max-width: 480px) {
+    .header-title {
+        font-size: 20px;
+    }
+
+    .header-subtitle {
+        font-size: 13px;
+    }
+
+    .bot-avatar {
+        width: 50px;
+        height: 50px;
+    }
+
+    .avatar-icon {
+        font-size: 24px;
+    }
+
+    .live-container {
+        padding: 12px;
+        gap: 12px;
+        grid-template-columns: 1fr;
+    }
+
+    .result-card {
+        padding: 16px;
+        max-width: 100%;
+        overflow-wrap: break-word;
+    }
+
+    .stats-container {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .stat-separator {
+        display: none;
+    }
+
+    .image-panel,
+    .results-panel {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .image-container {
+        width: 100%;
+        min-width: 0;
+        aspect-ratio: 16/9;
+    }
+
+    .result-success {
+        align-items: center;
+        gap: 12px;
+    }
+
+    .confidence-text {
+        position: absolute;
+        right: -30px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 11px;
+    }
+}
+
+/* Responsive para pantallas muy pequeñas */
+@media (max-width: 380px) {
+    .live-container {
+        padding: 8px;
+        gap: 8px;
+    }
+    
+    .result-card {
+        padding: 12px;
+    }
+    
+    .header-content {
+        gap: 8px;
+    }
+    
+    .bot-avatar {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .avatar-icon {
+        font-size: 20px;
+    }
+}

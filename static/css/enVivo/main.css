@@ -1,0 +1,13 @@
+/* main.css - Archivo principal que importa todos los módulos CSS */
+
+/* Importar todos los módulos en el orden correcto */
+@import url('variables.css');
+@import url('base.css');
+@import url('header.css');
+@import url('status.css');
+@import url('layout.css');
+@import url('image-display.css');
+@import url('results.css');
+@import url('footer.css');
+@import url('animations.css');
+@import url('responsive.css');

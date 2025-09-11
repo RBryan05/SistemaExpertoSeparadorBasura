@@ -1,0 +1,48 @@
+/* Indicador de estado de conexión */
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(15px);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 8px 16px;
+    margin-top: 20px;
+}
+
+/* Punto de estado con diferentes colores */
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.status-dot.connecting {
+    background: var(--accent-warning);
+    animation: pulse 2s infinite;
+}
+
+.status-dot.connected {
+    background: var(--accent-success);
+}
+
+.status-dot.disconnected {
+    background: var(--accent-error);
+}
+
+.status-dot.analyzing {
+    background: var(--accent-primary);
+    animation: pulse 1s infinite;
+}
+
+.status-dot.error {
+    background: var(--accent-error);
+}
+
+.status-text {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}

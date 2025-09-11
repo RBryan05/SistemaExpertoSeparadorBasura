@@ -1,0 +1,61 @@
+/* Encabezado principal */
+.live-header {
+    background: linear-gradient(135deg,
+            rgba(0, 122, 255, 0.15) 0%,
+            rgba(88, 86, 214, 0.15) 100%);
+    backdrop-filter: blur(30px);
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: var(--shadow-glass);
+    padding: 20px;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Avatar del bot */
+.bot-avatar {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg,
+            rgba(0, 122, 255, 0.2) 0%,
+            rgba(88, 86, 214, 0.2) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(0, 122, 255, 0.2);
+}
+
+.avatar-icon {
+    font-size: 28px;
+}
+
+.header-info {
+    flex: 1;
+}
+
+/* Títulos del encabezado */
+.header-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 4px 0;
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.header-subtitle {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin: 0;
+}

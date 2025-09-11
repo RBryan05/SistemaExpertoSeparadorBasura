@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a0a0f">
+    <meta name="color-scheme" content="dark">
+    <title>EcoBot - Análisis en Vivo</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/enVivo/main.css') }}">
+</head>
+
+<body>
+    <!-- Header Principal -->
+    <header class="live-header">
+        <div class="header-content">
+            <div class="bot-avatar">
+                <span class="avatar-icon">🤖</span>
+            </div>
+            <div class="header-info">
+                <h1 class="header-title">EcoBot - Análisis en Vivo</h1>
+                <p class="header-subtitle">Clasificación de materiales reciclables en tiempo real</p>
+            </div>
+        </div>
+
+        <!-- Indicador de estado -->
+        <div class="status-indicator">
+            <div class="status-dot" id="statusDot"></div>
+            <span class="status-text" id="statusText">Esperando...</span>
+        </div>
+    </header>
+
+    <!-- Contenedor principal -->
+    <main class="live-container">
+        <!-- Panel de imagen -->
+        <section class="image-panel">
+            <div class="image-container">
+                <img id="imagen" src="#" alt="Imagen en vivo" class="live-image">
+                <div class="image-overlay" id="imageOverlay">
+                    <div class="waiting-state">
+                        <div class="pulse-animation">
+                            <div class="pulse-circle"></div>
+                            <div class="pulse-circle pulse-delay-1"></div>
+                            <div class="pulse-circle pulse-delay-2"></div>
+                        </div>
+                        <p class="waiting-text">Esperando primera imagen...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Panel de resultados -->
+        <section class="results-panel">
+            <div class="result-card">
+                <div class="result-header">
+                    <h2 class="result-title">Resultado del Análisis</h2>
+                    <div class="analysis-badge" id="analysisBadge">
+                        <span class="badge-icon">🔍</span>
+                        <span class="badge-text">IA</span>
+                    </div>
+                </div>
+
+                <div class="result-content" id="resultado">
+                    <div class="result-placeholder">
+                        <div class="placeholder-icon">⏳</div>
+                        <p>Esperando análisis...</p>
+                    </div>
+                </div>
+
+                <!-- Información adicional -->
+                <div class="result-details" id="resultDetails" style="display: none;">
+                    <div class="detail-item">
+                        <span class="detail-label">Confianza:</span>
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" id="confidenceFill"></div>
+                            <span class="confidence-text" id="confidenceText">0%</span>
+                        </div>
+                    </div>
+
+                    <div class="detail-item">
+                        <span class="detail-label">Tipo de material:</span>
+                        <span class="detail-value" id="materialType">-</span>
+                    </div>
+
+                    <div class="detail-item">
+                        <span class="detail-label">Hora:</span>
+                        <span class="detail-value" id="timestamp">-</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer con estadísticas -->
+    <footer class="live-footer">
+        <div class="stats-container">
+            <div class="stat-item">
+                <span class="stat-value" id="totalAnalyzed">0</span>
+                <span class="stat-label">Analizadas</span>
+            </div>
+            <div class="stat-separator"></div>
+            <div class="stat-item">
+                <span class="stat-value" id="successRate">-</span>
+                <span class="stat-label">Precisión</span>
+            </div>
+            <div class="stat-separator"></div>
+            <div class="stat-item">
+                <span class="stat-value" id="uptime">0:00</span>
+                <span class="stat-label">Tiempo activo</span>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module" src="{{ url_for('static', filename='js/live/main.js') }}"></script>
+</body>
+
+</html>

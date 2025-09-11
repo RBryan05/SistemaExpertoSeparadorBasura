@@ -1,0 +1,18 @@
+/* Variables CSS para modo oscuro y configuración global */
+:root {
+    --bg-primary: #0a0a0f;
+    --bg-secondary: #1a1a24;
+    --bg-chat: #111118;
+    --text-primary: #ffffff;
+    --text-secondary: #b8bcc8;
+    --text-muted: #6b7280;
+    --accent-primary: #007aff;
+    --accent-secondary: #5856d6;
+    --accent-success: #34d399;
+    --accent-warning: #fbbf24;
+    --accent-error: #f87171;
+    --border-color: rgba(255, 255, 255, 0.1);
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.3);
+}

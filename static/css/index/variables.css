@@ -1,0 +1,39 @@
+/* variables.css - Variables globales del tema oscuro */
+:root {
+    /* Colores principales */
+    --bg-primary: #0a0a0f;
+    --bg-secondary: #1a1a24;
+    --bg-chat: #111118;
+    
+    /* Texto */
+    --text-primary: #ffffff;
+    --text-secondary: #b8bcc8;
+    
+    /* Acentos */
+    --accent-primary: #007aff;
+    --accent-secondary: #5856d6;
+    
+    /* Bordes y efectos */
+    --border-color: rgba(255, 255, 255, 0.1);
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.3);
+    
+    /* Gradientes reutilizables */
+    --gradient-primary: linear-gradient(135deg, rgba(0, 122, 255, 0.15) 0%, rgba(88, 86, 214, 0.15) 100%);
+    --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+    
+    /* Espaciado */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 12px;
+    --spacing-lg: 16px;
+    --spacing-xl: 20px;
+    
+    /* Bordes redondeados */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 20px;
+    --radius-xl: 24px;
+    --radius-full: 50%;
+}

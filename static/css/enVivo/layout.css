@@ -1,0 +1,24 @@
+/* Contenedor principal con grid layout */
+.live-container {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr minmax(280px, 400px);
+    gap: 20px;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+    overflow: visible;
+}
+
+/* Panel izquierdo para la imagen */
+.image-panel {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Panel derecho para los resultados */
+.results-panel {
+    display: flex;
+    flex-direction: column;
+}

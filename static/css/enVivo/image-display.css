@@ -1,0 +1,70 @@
+/* Contenedor de la imagen con efecto cristal */
+.image-container {
+    position: relative;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--shadow-glass);
+    aspect-ratio: 16/9;
+    min-height: 240px;
+}
+
+/* Imagen en vivo */
+.live-image {
+    display: none;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: opacity 0.3s ease;
+}
+
+/* Overlay que aparece cuando no hay imagen */
+.image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+}
+
+.waiting-state {
+    text-align: center;
+}
+
+/* Animación de pulso mientras espera */
+.pulse-animation {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 20px;
+}
+
+.pulse-circle {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    border: 2px solid var(--accent-primary);
+    border-radius: 50%;
+    opacity: 0;
+    animation: pulseRing 2s ease-out infinite;
+}
+
+.pulse-delay-1 {
+    animation-delay: 0.5s;
+}
+
+.pulse-delay-2 {
+    animation-delay: 1s;
+}
+
+.waiting-text {
+    font-size: 16px;
+    color: var(--text-secondary);
+}

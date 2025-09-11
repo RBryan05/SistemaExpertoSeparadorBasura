@@ -1,0 +1,104 @@
+/* input.css - Estilos del área de entrada */
+.input-area {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+
+.input-container {
+    display: flex;
+    align-items: flex-end;
+    padding: var(--spacing-xl);
+    gap: var(--spacing-md);
+}
+
+.text-input-container {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(15px);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    transition: border-color 0.2s ease;
+}
+
+.text-input-container:focus-within {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
+}
+
+#messageInput {
+    width: 100%;
+    background: var(--bg-chat);
+    border: none;
+    outline: none;
+    padding: var(--spacing-md) var(--spacing-xl);
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--text-primary);
+    resize: none;
+    overflow-y: auto;
+    min-height: 44px; /* Altura mínima más cómoda */
+    border-radius: var(--radius-lg);
+}
+
+#messageInput::placeholder {
+    color: var(--text-secondary);
+}
+
+/* Botones */
+.attach-btn,
+.send-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    border: 1px solid var(--border-color);
+}
+
+.attach-btn {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(15px);
+    color: var(--text-secondary);
+}
+
+.attach-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--text-primary);
+}
+
+.send-btn {
+    background: var(--gradient-primary);
+    backdrop-filter: blur(30px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    color: var(--text-primary);
+}
+
+.send-btn:hover:not(:disabled) {
+    box-shadow: 0 6px 20px rgba(0, 122, 255, 0.4);
+    transform: scale(1.05);
+}
+
+.send-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.send-btn.cancel-mode:disabled {
+    background: var(--gradient-primary);
+    opacity: 1;
+}
+
+.send-btn.cancel-mode:disabled:hover {
+    background: var(--gradient-primary);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
