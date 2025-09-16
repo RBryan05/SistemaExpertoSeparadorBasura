@@ -1,6 +1,160 @@
 {
   "created": "2025-09-10T22:00:09.081631",
   "description": "Historial persistente de análisis en vivo - nunca se borra",
-  "total_images_analyzed": 0,
-  "analyses": []
+  "total_images_analyzed": 9,
+  "analyses": [
+    {
+      "timestamp": "2025-09-11T19:39:22.461757",
+      "origen": "live",
+      "imagen": {
+        "tipo": "url_live",
+        "url_original": "https://thumbs.dreamstime.com/b/botella-plástica-vacía-69306659.jpg",
+        "filename": "imagen_1757641159782.jpg",
+        "ruta": "static/uploads\\imagen_1757641159782.jpg",
+        "url_relativa": "/static/uploads/imagen_1757641159782.jpg"
+      },
+      "resultado": {
+        "etiqueta": "Vidrio",
+        "confianza": 0.6757331490516663,
+        "confianza_porcentaje": "67.6%"
+      },
+      "recomendacion": "Deposita el vidrio en cualquier momento: los contenedores están disponibles 24/7."
+    },
+    {
+      "timestamp": "2025-09-11T19:39:50.755700",
+      "origen": "live",
+      "imagen": {
+        "tipo": "url_live",
+        "url_original": "https://thumbs.dreamstime.com/b/botella-plástica-vacía-69306659.jpg",
+        "filename": "imagen_1757641189587.jpg",
+        "ruta": "static/uploads\\imagen_1757641189587.jpg",
+        "url_relativa": "/static/uploads/imagen_1757641189587.jpg"
+      },
+      "resultado": {
+        "etiqueta": "Vidrio",
+        "confianza": 0.6757331490516663,
+        "confianza_porcentaje": "67.6%"
+      },
+      "recomendacion": "El vidrio se puede reciclar infinitas veces sin perder calidad. ¡Cada envase cuenta!"
+    },
+    {
+      "timestamp": "2025-09-11T19:42:08.782831",
+      "origen": "live",
+      "imagen": {
+        "tipo": "url_live",
+        "url_original": "https://thumbs.dreamstime.com/b/botella-plástica-vacía-69306659.jpg",
+        "filename": "imagen_1757641326494.jpg",
+        "ruta": "static/uploads\\imagen_1757641326494.jpg",
+        "url_relativa": "/static/uploads/imagen_1757641326494.jpg"
+      },
+      "resultado": {
+        "etiqueta": "Plastico",
+        "confianza": 0.5606210231781006,
+        "confianza_porcentaje": "56.1%"
+      },
+      "recomendacion": "Retira etiquetas solo si se desprenden fácilmente, sino déjalas."
+    },
+    {
+      "timestamp": "2025-09-11T19:48:51.721099",
+      "origen": "live",
+      "imagen": {
+        "tipo": "ruta_local_live",
+        "ruta_original": "C:\\Users\\bryan\\OneDrive\\Escritorio\\ActivarCamaraArduino\\captura_1757641730.jpg",
+        "filename": "imagen_1757641730539.jpg",
+        "ruta": "static/uploads\\imagen_1757641730539.jpg",
+        "url_relativa": "/static/uploads/imagen_1757641730539.jpg"
+      },
+      "resultado": {
+        "etiqueta": "Plastico",
+        "confianza": 0.9890170097351074,
+        "confianza_porcentaje": "98.9%"
+      },
+      "recomendacion": "Separa plásticos según tipo si es posible, evita restos de comida y deposítalos en contenedores de plástico."
+    },
+    {
+      "timestamp": "2025-09-11T19:50:19.526288",
+      "origen": "live",
+      "imagen": {
+        "tipo": "ruta_local_live",
+        "ruta_original": "C:\\Users\\bryan\\OneDrive\\Escritorio\\ActivarCamaraArduino\\captura_1757641819.jpg",
+        "filename": "imagen_1757641819183.jpg",
+        "ruta": "static/uploads\\imagen_1757641819183.jpg",
+        "url_relativa": "/static/uploads/imagen_1757641819183.jpg"
+      },
+      "resultado": {
+        "etiqueta": "Plastico",
+        "confianza": 0.9120663404464722,
+        "confianza_porcentaje": "91.2%"
+      },
+      "recomendacion": "Los plásticos negros son difíciles de reciclar, prefiere otros colores."
+    },
+    {
+      "timestamp": "2025-09-11T19:52:25.737299",
+      "origen": "live",
+      "imagen": {
+        "tipo": "ruta_local_live",
+        "ruta_original": "C:\\Users\\bryan\\OneDrive\\Escritorio\\ActivarCamaraArduino\\captura_1757641945.jpg",
+        "filename": "imagen_1757641945509.jpg",
+        "ruta": "static/uploads\\imagen_1757641945509.jpg",
+        "url_relativa": "/static/uploads/imagen_1757641945509.jpg"
+      },
+      "resultado": {
+        "etiqueta": "Plastico",
+        "confianza": 0.9547809362411499,
+        "confianza_porcentaje": "95.5%"
+      },
+      "recomendacion": "Enjuaga los envases para eliminar restos orgánicos antes del reciclaje."
+    },
+    {
+      "timestamp": "2025-09-11T19:52:37.731184",
+      "origen": "live",
+      "imagen": {
+        "tipo": "ruta_local_live",
+        "ruta_original": "C:\\Users\\bryan\\OneDrive\\Escritorio\\ActivarCamaraArduino\\captura_1757641957.jpg",
+        "filename": "imagen_1757641957440.jpg",
+        "ruta": "static/uploads\\imagen_1757641957440.jpg",
+        "url_relativa": "/static/uploads/imagen_1757641957440.jpg"
+      },
+      "resultado": {
+        "etiqueta": "Plastico",
+        "confianza": 0.8810350894927979,
+        "confianza_porcentaje": "88.1%"
+      },
+      "recomendacion": "Los envases de yogur y bandejas de alimentos también son reciclables."
+    },
+    {
+      "timestamp": "2025-09-11T19:53:42.499742",
+      "origen": "live",
+      "imagen": {
+        "tipo": "ruta_local_live",
+        "ruta_original": "C:\\Users\\bryan\\OneDrive\\Escritorio\\ActivarCamaraArduino\\captura_1757642022.jpg",
+        "filename": "imagen_1757642022259.jpg",
+        "ruta": "static/uploads\\imagen_1757642022259.jpg",
+        "url_relativa": "/static/uploads/imagen_1757642022259.jpg"
+      },
+      "resultado": {
+        "etiqueta": "Plastico",
+        "confianza": 0.8908355236053467,
+        "confianza_porcentaje": "89.1%"
+      },
+      "recomendacion": "Evita aplastar botellas verticalmente; mejor hazlo horizontalmente."
+    },
+    {
+      "timestamp": "2025-09-11T19:53:44.352580",
+      "origen": "live",
+      "imagen": {
+        "tipo": "ruta_local_live",
+        "ruta_original": "C:\\Users\\bryan\\OneDrive\\Escritorio\\ActivarCamaraArduino\\captura_1757642024.jpg",
+        "filename": "imagen_1757642024099.jpg",
+        "ruta": "static/uploads\\imagen_1757642024099.jpg",
+        "url_relativa": "/static/uploads/imagen_1757642024099.jpg"
+      },
+      "resultado": {
+        "etiqueta": "Plastico",
+        "confianza": 0.9216029644012451,
+        "confianza_porcentaje": "92.2%"
+      },
+      "recomendacion": "Una botella de plástico puede tardar hasta 450 años en degradarse naturalmente."
+    }
+  ]
 }
